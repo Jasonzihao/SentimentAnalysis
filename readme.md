@@ -1,9 +1,9 @@
 # SensitivityAnalysis tool with web(including training code)
 ## CNN + LSTM + ATTENTION BASED IMDB DATESET
-**  update later**
+**update later**
 ## how to strat
-**  update later**
+**update later**
 ## requirements
-** update later**
+*update later**
 
 HUST EIC DJS
