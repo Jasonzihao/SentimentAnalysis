@@ -23,7 +23,8 @@ import gensim
 import gensim.downloader as api
 
 from model import MAIN_Model
-from preprocess import tokenize, padding_
+from preprocess import tokenize, padding_, tokenize_with_punkt
+from train_word2vc import load_word2vc
 
 is_cuda = torch.cuda.is_available()
 
@@ -51,7 +52,9 @@ y_test = dataset['test']['label']
 
 import nltk
 nltk.download('stopwords')
-x_train,y_train,x_test,y_test,vocab = tokenize(x_train,y_train,x_test,y_test)
+nltk.download('punkt_tab')
+# x_train,y_train,x_test,y_test,vocab = tokenize(x_train,y_train,x_test,y_test)
+x_train,y_train,x_test,y_test,vocab = tokenize_with_punkt(x_train,y_train,x_test,y_test)
 print("success tokenize!")
 
 x_train_pad = padding_(x_train,500)
@@ -77,7 +80,11 @@ vocab_size = len(vocab) + 1 #extra 1 for padding
 embedding_dim = 500
 output_dim = 1
 hidden_dim = 500
+word2vec = load_word2vc()
+
 model = MAIN_Model(no_layers,vocab_size,embedding_dim,hidden_dim)
+# model = MAIN_Model(no_layers,vocab_size,embedding_dim,hidden_dim,word2vec)
+
 model.to(device)
 print(model)
 dataiter = iter(train_loader)
@@ -86,7 +93,7 @@ sample_x = sample_x.to(device)
 h = model.init_hidden(batch_size, device)
 o , hh = model(sample_x,h)
 
-max_epoch = 10
+max_epoch = 20
 train_loss = []
 test_loss = []
 acc = []
@@ -154,7 +161,6 @@ df_cm = pd.DataFrame(cf_matrix , index = [i for i in classes],
                      columns = [i for i in classes])
 plt.figure(figsize = (12,7))
 sn.heatmap(df_cm, annot=True, fmt='g')
-plt.savefig('output.png')
 
 fig, (ax1, ax2) = plt.subplots(1, 2,figsize=(10, 6))
 fig.tight_layout(pad=5.0)

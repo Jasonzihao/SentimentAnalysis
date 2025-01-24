@@ -45,7 +45,7 @@ def analysis(query):
         device = torch.device("cpu")
         print("GPU not available, CPU used")
     # 加载预训练的词汇表，这里假设你在训练时已经保存了词汇表
-    with open('onehot_dict.json', 'r') as f:
+    with open('onehot_dict_punk.json', 'r') as f:
         vocab = json.load(f)
     # 加载模型
     model_path = 'model_pt/djs_best.pt'  # 请将此路径修改为你实际保存的模型文件路径

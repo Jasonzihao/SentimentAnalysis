@@ -121,9 +121,15 @@ import gensim.downloader as api
 
 class MAIN_Model(nn.Module):
 
-    def __init__(self, no_layers, vocab_size, embedding_dim, hidden_dim):
+    def __init__(self, no_layers, vocab_size, embedding_dim, hidden_dim, pretrained_embeddings=None):
         super(MAIN_Model, self).__init__()
-        self.embedding = nn.Embedding(vocab_size, embedding_dim)
+
+        # 使用预训练的 Word2Vec 嵌入
+        if pretrained_embeddings is not None:
+            self.embedding = nn.Embedding.from_pretrained(pretrained_embeddings, freeze=True)  # freeze=True 表示不训练嵌入层
+        else:
+            self.embedding = nn.Embedding(vocab_size, embedding_dim)
+        # self.embedding = nn.Embedding(vocab_size, embedding_dim)
         self.conv1 = nn.Conv1d(embedding_dim, 64, kernel_size=5, stride=1, padding=2)  # 保持输入输出维度一致
         self.conv_bn1 = nn.BatchNorm1d(64)  # 对第1层卷积进行BatchNorm
 
@@ -137,8 +143,9 @@ class MAIN_Model(nn.Module):
         self.dropout = nn.Dropout(p=0.3)
 
         self.lstm = nn.LSTM(input_size=256, hidden_size=hidden_dim, num_layers=no_layers, bidirectional=True, batch_first=True)
+        # 在 LSTM 输出后添加归一化层
+        self.lstm_bn = nn.BatchNorm1d(hidden_dim * 2)
 
-        self.lstm_norm = nn.LayerNorm(hidden_dim * 2)
         self.fc_dropout = nn.Dropout(p=0.3)
 
         self.fc = nn.Linear(hidden_dim * 2, 100)
@@ -190,10 +197,11 @@ class MAIN_Model(nn.Module):
 
         x = self.dropout(x)
         output, (hidden, cell) = self.lstm(x.transpose(1, 2), hidden)  # 需要调整维度为 (batch_size, seq_len, input_size)
+        # 对 LSTM 输出应用归一化
+        output = self.lstm_bn(output.transpose(1, 2)).transpose(1, 2)
 
-
+        # 使用 Attention 机制
         attn_output = self.attention(output, hidden)
-
         attn_output = self.fc_dropout(attn_output)
 
         out = self.fc(attn_output.squeeze(0))
