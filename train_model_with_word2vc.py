@@ -24,7 +24,39 @@ import gensim.downloader as api
 
 from model import MAIN_Model, MAIN_PLUS_WORD2VC_Model
 from preprocess import tokenize, padding_, tokenize_with_punkt
-from train_word2vc import load_word2vc
+import nltk
+
+
+class textDataset(Dataset):
+  # Initialize your data, download, etc.
+    def __init__(self, text_features, labels):
+        super(textDataset, self).__init__()
+        self.len = len(text_features)
+        self.text_features = text_features
+        self.labels = labels
+        self.wrong_words = []
+
+    def __getitem__(self, index):
+        inputs = self.text_features[index,:,:]
+        labels = self.labels[index]
+        return inputs.float(), labels
+
+    def __len__(self):
+        return self.len
+
+def get_dataloader(batch_size):
+    text_features_path = 'data/word2vec_features.npy'
+    labels_path = 'data/labels.npy'
+    text_features = torch.from_numpy(np.load(text_features_path)).cuda()
+    labels = torch.from_numpy(np.load(labels_path)).cuda()
+    train_dataset = textDataset(text_features=text_features[0:25000],labels=labels[0:25000])
+    test_dataset = textDataset(text_features=text_features[25000:50000],labels=labels[25000:50000])
+    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    print("get dataloader successfully")
+    return (train_loader,test_loader)
+
+
 
 is_cuda = torch.cuda.is_available()
 # If we have a GPU available, we'll set our device to GPU. We'll use this device variable later in our code.
@@ -35,53 +67,15 @@ else:
     device = torch.device("cpu")
     print("GPU not available, CPU used")
 
-#load dataset
-from datasets import load_dataset
-dataset = load_dataset("imdb")
-
-#create test and train split
-x_train = dataset['train']['text']
-y_train = dataset['train']['label']
-x_test = dataset['test']['text']
-y_test = dataset['test']['label']
-# print(f"len of x_train:{len(x_train)}")
-# print(f"len of y_train:{len(y_train)}")
-# print(f"len of x_test:{len(x_test)}")
-# print(f"len of y_test:{len(y_test)}")
-
-import nltk
-nltk.download('stopwords')
-nltk.download('punkt_tab')
-# x_train,y_train,x_test,y_test,vocab = tokenize(x_train,y_train,x_test,y_test)
-x_train,y_train,x_test,y_test,vocab = tokenize_with_punkt(x_train,y_train,x_test,y_test)
-print("success tokenize!")
-
-x_train_pad = padding_(x_train,500)
-x_test_pad = padding_(x_test,500)
-
-# create Tensor datasets
-train_data = TensorDataset(torch.from_numpy(x_train_pad), torch.from_numpy(y_train))
-valid_data = TensorDataset(torch.from_numpy(x_test_pad), torch.from_numpy(y_test))
-
 # dataloaders
 batch_size = 32
-
-# make sure to SHUFFLE your data
-train_loader = DataLoader(train_data, shuffle=True, batch_size=batch_size,drop_last=True)
-valid_loader = DataLoader(valid_data, shuffle=True, batch_size=batch_size,drop_last=True)
-
-#one random sample
-dataiter = iter(train_loader)
-sample_x, sample_y = next(dataiter)
+(train_loader,valid_loader) = get_dataloader(batch_size)
 
 no_layers = 1
-vocab_size = len(vocab) + 1 #extra 1 for padding
-print(f"vocab_size:{vocab_size}")
-
-embedding_dim = 500
+embedding_dim = 32
 output_dim = 1
 hidden_dim = 500
-model = MAIN_Model(no_layers,vocab_size,embedding_dim,hidden_dim)
+model = MAIN_PLUS_WORD2VC_Model(no_layers,embedding_dim,hidden_dim)
 
 model.to(device)
 print(model)
@@ -112,7 +106,7 @@ for epoch in range(max_epoch):
         optimizer.zero_grad()
         outputs,h = model(inputs,h)
         #print(outputs.shape)
-        loss = criterion(outputs.reshape(32), labels.float())
+        loss = criterion(outputs.reshape(batch_size), labels.float())
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
@@ -146,8 +140,8 @@ for epoch in range(max_epoch):
     test_accuracy = (correct / total)
     print(f"Test Accuracy: {test_accuracy}")
     acc.append(test_accuracy)
-    if test_accuracy > 0.87:
-        torch.save(model.state_dict(), f'model_pt/djs_model_epoch_{test_accuracy}.pt')
+    if test_accuracy > 0.86:
+        torch.save(model.state_dict(), f'model_pt/djs_model_plusword2vc_{test_accuracy}.pt')
     # if (epoch + 1) % 5 == 0:
     #     torch.save(model.state_dict(), f'model_pt/djs_model_epoch_{epoch + 1}.pt')
 

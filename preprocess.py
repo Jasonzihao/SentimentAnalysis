@@ -57,7 +57,7 @@ def tokenize(x_train,y_train,x_val,y_val):
     # creating a dict
     onehot_dict = {w:i+1 for i,w in enumerate(corpus_)}
 
-    # tockenize
+    # tokenize
     final_list_train,final_list_test = [],[]
     for sent in x_train:
             final_list_train.append([onehot_dict[preprocess_string(word)] for word in sent.lower().split()

@@ -4,18 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7066c862-4eb3-4feb-85d3-e6f5c5e0a9b7" name="Changes" comment="update readme">
-      <change afterPath="$PROJECT_DIR$/train_word2vc.py" afterDir="false" />
+    <list default="true" id="7066c862-4eb3-4feb-85d3-e6f5c5e0a9b7" name="Changes" comment="add lstm_norm and use word2vc tokenized by punkt.">
+      <change afterPath="$PROJECT_DIR$/train_model_with_word2vc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_pt/djs_best.pt" beforeDir="false" afterPath="$PROJECT_DIR$/model_pt/djs_best.pt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_10.pt" beforeDir="false" afterPath="$PROJECT_DIR$/model_pt/djs_model_epoch_10.pt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_20.pt" beforeDir="false" afterPath="$PROJECT_DIR$/model_pt/djs_model_epoch_20.pt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_5.pt" beforeDir="false" afterPath="$PROJECT_DIR$/model_pt/djs_model_epoch_5.pt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/onehot_dict_punk.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/preprocess.py" beforeDir="false" afterPath="$PROJECT_DIR$/preprocess.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train_word2vc.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_word2vc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model" beforeDir="false" afterPath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model.syn1neg.npy" beforeDir="false" afterPath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model.syn1neg.npy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model.wv.vectors.npy" beforeDir="false" afterPath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model.wv.vectors.npy" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,13 +50,14 @@
     "Python.main.executor": "Run",
     "Python.model.executor": "Run",
     "Python.train (1).executor": "Run",
+    "Python.train_model_with_word2vc.executor": "Run",
     "Python.train_word2vc.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "F:/学习文件/课程资源/毕设/Code_fromGithub/[4]sentiment-analysis-with-deep-neural-networks-main/sentiment-analysis-with-deep-neural-networks-main"
+    "last_opened_file_path": "F:/学习文件/课程资源/毕设/djsSensitivityAnalysis"
   }
 }]]></component>
-  <component name="RunManager" selected="Python.train (1)">
+  <component name="RunManager" selected="Python.train_model_with_word2vc">
     <configuration name="Analysis" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="djsSensitivityAnalysis" />
       <option name="ENV_FILES" value="" />
@@ -121,7 +124,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="train" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="train_model_with_word2vc" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="djsSensitivityAnalysis" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -134,7 +137,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="F:\学习文件\课程资源\毕设\djsSensitivityAnalysis\train.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train_model_with_word2vc.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -167,11 +170,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.train_model_with_word2vc" />
         <item itemvalue="Python.train (1)" />
         <item itemvalue="Python.train_word2vc" />
         <item itemvalue="Python.model" />
         <item itemvalue="Python.Analysis" />
-        <item itemvalue="Python.train" />
       </list>
     </recent_temporary>
   </component>
@@ -231,13 +234,30 @@
       <option name="project" value="LOCAL" />
       <updated>1737696668958</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="add lstm_norm and use word2vc tokenized by punkt.">
+      <option name="closed" value="true" />
+      <created>1737704239376</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1737704239376</updated>
+    </task>
+    <task id="LOCAL-00007" summary="add lstm_norm and use word2vc tokenized by punkt.">
+      <option name="closed" value="true" />
+      <created>1737704376627</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1737704376627</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="First commit" />
     <MESSAGE value="commit readme" />
     <MESSAGE value="update readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="update readme" />
+    <MESSAGE value="add lstm_norm and use word2vc tokenized by punkt." />
+    <option name="LAST_COMMIT_MESSAGE" value="add lstm_norm and use word2vc tokenized by punkt." />
   </component>
 </project>
