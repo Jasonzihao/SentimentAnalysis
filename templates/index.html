@@ -1,31 +1,48 @@
 <!DOCTYPE html>
-<html >
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Deployment Tutorial 1</title>
-  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.2/cdn.min.js" defer></script>
 </head>
+<body class="bg-gradient-to-r from-blue-500 to-purple-600 h-screen flex items-center justify-center relative">
+    <div class="absolute top-6 left-8 text-white text-2xl font-extrabold tracking-wide bg-white/10 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg animate-fade-in">
+        邓捷升毕业设计
+    </div>
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-[42rem] text-center" x-data="{ loading: false, prediction: '' }">
+    <h1 class="text-3xl font-extrabold text-gray-800 mb-6">Sentiment Analysis</h1>
+    <form @submit.prevent="
+        loading = true;
+        fetch('{{ url_for('predict') }}', { method: 'POST', body: new FormData($event.target) })
+        .then(response => response.json())
+        .then(data => {
+            prediction = 'Result: ' + data.result + '\nRate: ' + data.rate;
+            loading = false;
+        })">
+        <textarea name="review" placeholder="Enter the movie review here"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-400 outline-none transition duration-300 resize-none"
+            style="height: auto; min-height: 80px; max-height: 250px;" required
+            oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 250) + 'px'; this.style.overflowY = this.scrollHeight > 250 ? 'auto' : 'hidden';"></textarea>
 
-<body style="background: #069;">
- <div class="login">
-	<h1>Sentiments Analysis</h1>
-
-     <!-- Main Input For Receiving Query to our ML -->
-
-    <form action="{{ url_for('predict')}}"method="post">
-        <input type="text" name="Enter the product review here" placeholder="Enter the movie review here" required="required" />
-        <button type="submit" class="btn btn-primary btn-block btn-large">Predict Sentiment</button>
+        <button type="submit"
+            class="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300">
+            Predict Sentiment
+        </button>
     </form>
 
-   <br>
-   <br>
-   {{ prediction_text }}
-
- </div>
+    <div x-show="loading" class="mt-4 text-blue-600 animate-pulse">Processing...</div>
+    <div x-show="prediction" x-transition class="mt-4 text-lg font-semibold text-gray-700" style="white-space: pre-line;" x-text="prediction"></div>
+</div>
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.8s ease-out;
+        }
+    </style>
 </body>
 </html>

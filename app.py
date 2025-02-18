@@ -14,14 +14,11 @@ import nltk
 
 from Analysis import load_model, analysis
 
-nltk.download('stopwords')
-print("stopwords down")
+# nltk.download('stopwords')
+# print("stopwords down")
 from nltk.corpus import stopwords
 import io
 import json
-
-stopwords_list = set(stopwords.words('english'))
-maxlen = 100
 
 
 # Create the app object
@@ -34,27 +31,28 @@ app = Flask(__name__)
 
 
 # Define predict function
+from flask import Flask, render_template, request, jsonify
+
+app = Flask(__name__)
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/predict',methods=['POST'])
+
+@app.route('/predict', methods=['POST'])
 def predict():
-    answer = 0
     query_asis = [str(x) for x in request.form.values()]
-#     query_list = []
-#     query_list.append(query_asis)
-    
-    # Preprocess review text with earlier defined preprocess_text function
-    query_processed_list = []
+    answer = 0
+
     for query in query_asis:
         answer = analysis(query)
+    sentiment = "Positive" if answer > 0.5 else "Negative"
 
-    if answer > 0.5:
-        return render_template('index.html', prediction_text=f"Positive Review with probable IMDb rating as: {answer}")
-    else:
-        return render_template('index.html', prediction_text=f"Negative Review with probable IMDb rating as: {answer}")
+    return jsonify({"result": sentiment, "rate": answer})  # 返回 JSON 数据
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
