@@ -58,7 +58,7 @@ if __name__ == "__main__":
     text_size = 500
     embedding_size = 32
     # 训练 Word2Vec
-    word2vec_model = Word2Vec(sentences=tokenized_texts, vector_size=embedding_size, window=5, min_count=1, workers=4, sg=1, max_vocab_size=30000)  # sg=1 for Skip-Gram
+    word2vec_model = Word2Vec(sentences=tokenized_texts, vector_size=embedding_size, window=5, min_count=2, workers=4, sg=1, max_vocab_size=15000)  # sg=1 for Skip-Gram
     vocab_size = len(word2vec_model.wv) + 1  # 加1是为了考虑填充token
     print(word2vec_model.wv)
     print(f"vocab_size: {vocab_size}")

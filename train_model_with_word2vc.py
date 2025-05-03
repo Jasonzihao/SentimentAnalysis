@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 import torch.optim as optim
 from sklearn import preprocessing
 from torchsummary import summary
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, f1_score
 import seaborn as sn
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,34 +27,38 @@ from preprocess import tokenize, padding_, tokenize_with_punkt
 import nltk
 
 
-class textDataset(Dataset):
-  # Initialize your data, download, etc.
+class TextDataset(Dataset):
     def __init__(self, text_features, labels):
-        super(textDataset, self).__init__()
-        self.len = len(text_features)
+        super(TextDataset, self).__init__()
+        # 保持数据在 CPU 上
         self.text_features = text_features
         self.labels = labels
-        self.wrong_words = []
 
     def __getitem__(self, index):
-        inputs = self.text_features[index,:,:]
-        labels = self.labels[index]
-        return inputs.float(), labels
+        inputs = self.text_features[index, :, :]
+        label = self.labels[index]
+        return inputs.float(), label
 
     def __len__(self):
-        return self.len
+        return len(self.text_features)
+
 
 def get_dataloader(batch_size):
-    text_features_path = 'data/word2vec_features.npy'
-    labels_path = 'data/labels.npy'
-    text_features = torch.from_numpy(np.load(text_features_path)).cuda()
-    labels = torch.from_numpy(np.load(labels_path)).cuda()
-    train_dataset = textDataset(text_features=text_features[0:25000],labels=labels[0:25000])
-    test_dataset = textDataset(text_features=text_features[25000:50000],labels=labels[25000:50000])
-    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-    test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    text_features = np.load('data/word2vec_features.npy')
+    labels = np.load('data/labels.npy')
+    # 这里直接从 numpy 转成 tensor，数据仍在 CPU 上
+    text_features = torch.from_numpy(text_features)
+    labels = torch.from_numpy(labels)
+
+    train_dataset = TextDataset(text_features=text_features[:25000], labels=labels[:25000])
+    test_dataset = TextDataset(text_features=text_features[25000:50000], labels=labels[25000:50000])
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,
+                              drop_last=True,  pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False,
+                             drop_last=True,  pin_memory=True)
     print("get dataloader successfully")
-    return (train_loader,test_loader)
+    return train_loader, test_loader
 
 
 
@@ -68,13 +72,13 @@ else:
     print("GPU not available, CPU used")
 
 # dataloaders
-batch_size = 32
+batch_size = 128
 (train_loader,valid_loader) = get_dataloader(batch_size)
 
 no_layers = 1
 embedding_dim = 32
 output_dim = 1
-hidden_dim = 500
+hidden_dim = 256
 model = MAIN_PLUS_WORD2VC_Model(no_layers,embedding_dim,hidden_dim)
 
 model.to(device)
@@ -89,6 +93,7 @@ max_epoch = 20
 train_loss = []
 test_loss = []
 acc = []
+f1_scores = []
 # Define the loss function and optimizer
 criterion = nn.BCELoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
@@ -131,15 +136,18 @@ for epoch in range(max_epoch):
             loss = criterion(outputs.reshape(32), labels.float())
             test_running_loss += loss.item()
             predicted = torch.round(outputs).squeeze()
-            y_pred.extend(predicted)
-            y_true.extend(labels)
+            true_labels = labels
+            y_pred.extend(predicted.cpu().tolist())
+            y_true.extend(true_labels.cpu().tolist())
             total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            correct += (predicted == labels).sum().cpu().item()
         print(f"Epoch {epoch + 1}, Loss: {test_running_loss / len(valid_loader)}")
         test_loss.append(test_running_loss / len(valid_loader))
     test_accuracy = (correct / total)
-    print(f"Test Accuracy: {test_accuracy}")
     acc.append(test_accuracy)
+    f1 = f1_score(y_true, y_pred)
+    f1_scores.append(f1)
+    print(f"Test Accuracy: {test_accuracy} F1 score: {f1}")
     if test_accuracy > 0.86:
         torch.save(model.state_dict(), f'model_pt/djs_model_plusword2vc_{test_accuracy}.pt')
     # if (epoch + 1) % 5 == 0:

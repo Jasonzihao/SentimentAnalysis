@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 import torch.optim as optim
 from sklearn import preprocessing
 from torchsummary import summary
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, f1_score
 import seaborn as sn
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,28 +36,30 @@ else:
     print("GPU not available, CPU used")
 
 #load dataset
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
+
 dataset = load_dataset("imdb")
+# dataset = load_from_disk("imdb")
 
 #create test and train split
 x_train = dataset['train']['text']
 y_train = dataset['train']['label']
 x_test = dataset['test']['text']
 y_test = dataset['test']['label']
-# print(f"len of x_train:{len(x_train)}")
-# print(f"len of y_train:{len(y_train)}")
-# print(f"len of x_test:{len(x_test)}")
-# print(f"len of y_test:{len(y_test)}")
+print(f"len of x_train:{len(x_train)}")
+print(f"len of y_train:{len(y_train)}")
+print(f"len of x_test:{len(x_test)}")
+print(f"len of y_test:{len(y_test)}")
 
 import nltk
 nltk.download('stopwords')
 nltk.download('punkt_tab')
 # x_train,y_train,x_test,y_test,vocab = tokenize(x_train,y_train,x_test,y_test)
-x_train,y_train,x_test,y_test,vocab = tokenize_with_punkt(x_train,y_train,x_test,y_test)
+x_train_pad,y_train,x_test_pad,y_test,vocab = tokenize_with_punkt(x_train,y_train,x_test,y_test)
 print("success tokenize!")
 
-x_train_pad = padding_(x_train,500)
-x_test_pad = padding_(x_test,500)
+# x_train_pad = padding_(x_train,500)
+# x_test_pad = padding_(x_test,500)
 
 # create Tensor datasets
 train_data = TensorDataset(torch.from_numpy(x_train_pad), torch.from_numpy(y_train))
@@ -67,12 +69,12 @@ valid_data = TensorDataset(torch.from_numpy(x_test_pad), torch.from_numpy(y_test
 batch_size = 32
 
 # make sure to SHUFFLE your data
-train_loader = DataLoader(train_data, shuffle=True, batch_size=batch_size,drop_last=True)
-valid_loader = DataLoader(valid_data, shuffle=True, batch_size=batch_size,drop_last=True)
+train_loader = DataLoader(train_data, shuffle=True, batch_size=batch_size, drop_last=True, pin_memory=True)
+valid_loader = DataLoader(valid_data, shuffle=True, batch_size=batch_size, drop_last=True, pin_memory=True)
 
 #one random sample
-dataiter = iter(train_loader)
-sample_x, sample_y = next(dataiter)
+# dataiter = iter(train_loader)
+# sample_x, sample_y = next(dataiter)
 
 no_layers = 1
 vocab_size = len(vocab) + 1 #extra 1 for padding
@@ -95,6 +97,7 @@ max_epoch = 20
 train_loss = []
 test_loss = []
 acc = []
+f1_scores = []
 # Define the loss function and optimizer
 criterion = nn.BCELoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
@@ -112,7 +115,7 @@ for epoch in range(max_epoch):
         optimizer.zero_grad()
         outputs,h = model(inputs,h)
         #print(outputs.shape)
-        loss = criterion(outputs.reshape(32), labels.float())
+        loss = criterion(outputs.reshape(batch_size), labels.float())
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
@@ -134,20 +137,23 @@ for epoch in range(max_epoch):
             inputs, labels = data
             inputs, labels = inputs.to(device), labels.to(device)
             outputs,val_h = model(inputs,val_h)
-            loss = criterion(outputs.reshape(32), labels.float())
+            loss = criterion(outputs.reshape(batch_size), labels.float())
             test_running_loss += loss.item()
             predicted = torch.round(outputs).squeeze()
-            y_pred.extend(predicted)
-            y_true.extend(labels)
+            true_labels = labels
+            y_pred.extend(predicted.cpu().tolist())
+            y_true.extend(true_labels.cpu().tolist())
             total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            correct += (predicted == labels).sum().cpu().item()
         print(f"Epoch {epoch + 1}, Loss: {test_running_loss / len(valid_loader)}")
         test_loss.append(test_running_loss / len(valid_loader))
     test_accuracy = (correct / total)
-    print(f"Test Accuracy: {test_accuracy}")
     acc.append(test_accuracy)
-    if test_accuracy > 0.87:
-        torch.save(model.state_dict(), f'model_pt/djs_model_epoch_{test_accuracy}.pt')
+    f1 = f1_score(y_true, y_pred)
+    f1_scores.append(f1)
+    print(f"Test Accuracy: {test_accuracy}, F1_score: {f1}")
+    if test_accuracy > 0.862:
+        torch.save(model.state_dict(), f'model_pt/djs_model_epoch_{test_accuracy}_em{embedding_dim}_hi{hidden_dim}_ba{batch_size}.pt')
     # if (epoch + 1) % 5 == 0:
     #     torch.save(model.state_dict(), f'model_pt/djs_model_epoch_{epoch + 1}.pt')
 
@@ -165,6 +171,7 @@ fig, (ax1, ax2) = plt.subplots(1, 2,figsize=(10, 6))
 fig.tight_layout(pad=5.0)
 ax1.plot(train_loss, label="train loss")
 ax1.plot(test_loss,label="test loss")
+ax1.plot(f1_scores, label="F1 score")
 ax1.set_title("loss")
 ax2.plot(acc)
 ax2.set_title("accuracy")

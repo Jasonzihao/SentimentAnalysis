@@ -20,6 +20,7 @@ from nltk.corpus import stopwords
 import io
 import json
 
+from deepseekAPI import deepseek
 
 # Create the app object
 app = Flask(__name__)
@@ -48,9 +49,12 @@ def predict():
 
     for query in query_asis:
         answer = analysis(query)
+        # answer_deepseek = deepseek(query)
     sentiment = "Positive" if answer > 0.5 else "Negative"
 
-    return jsonify({"result": sentiment, "rate": answer})  # 返回 JSON 数据
+    # 返回 JSON 数据
+    return jsonify({"result": sentiment, "rate": answer})
+    # return jsonify({"result": answer_deepseek, "rate": "deepseek"})
 
 
 if __name__ == "__main__":

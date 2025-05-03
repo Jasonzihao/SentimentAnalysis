@@ -4,15 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7066c862-4eb3-4feb-85d3-e6f5c5e0a9b7" name="Changes" comment="add word2vc model train and use">
-      <change afterPath="$PROJECT_DIR$/templates/index_origin.html" afterDir="false" />
+    <list default="true" id="7066c862-4eb3-4feb-85d3-e6f5c5e0a9b7" name="Changes" comment="update the front of web">
+      <change afterPath="$PROJECT_DIR$/downloadData.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_10.pt" beforeDir="false" afterPath="$PROJECT_DIR$/model_pt/djs_model_epoch_10.pt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_20.pt" beforeDir="false" afterPath="$PROJECT_DIR$/model_pt/djs_model_epoch_20.pt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_5.pt" beforeDir="false" afterPath="$PROJECT_DIR$/model_pt/djs_model_epoch_5.pt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_10.pt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_20.pt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_pt/djs_model_epoch_5.pt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/onehot_dict_punk.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/preprocess.py" beforeDir="false" afterPath="$PROJECT_DIR$/preprocess.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train_model_with_word2vc.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_model_with_word2vc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train_word2vc.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_word2vc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model" beforeDir="false" afterPath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model.syn1neg.npy" beforeDir="false" afterPath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model.syn1neg.npy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model.wv.vectors.npy" beforeDir="false" afterPath="$PROJECT_DIR$/word2vc_model/imdb_word2vec.model.wv.vectors.npy" afterDir="false" />
@@ -25,8 +31,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -46,7 +52,10 @@
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
     "Python.Analysis.executor": "Run",
+    "Python.TencentTest.executor": "Run",
     "Python.app.executor": "Run",
+    "Python.deepseekAPI.executor": "Run",
+    "Python.downloadData.executor": "Run",
     "Python.main.executor": "Run",
     "Python.model.executor": "Run",
     "Python.train (1).executor": "Run",
@@ -54,10 +63,33 @@
     "Python.train_word2vc.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "F:/学习文件/课程资源/毕设/djsSensitivityAnalysis"
+    "last_opened_file_path": "F:/学习文件/课程资源/毕设/Code_fromGithub/[5]sentiment-IMDB-main",
+    "settings.editor.selected.configurable": "com.intellij.pycharm.community.ide.impl.configuration.PythonContentEntriesConfigurable"
   }
 }]]></component>
   <component name="RunManager" selected="Python.app">
+    <configuration name="TencentTest" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="djsSensitivityAnalysis" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/TencentTest.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="djsSensitivityAnalysis" />
       <option name="ENV_FILES" value="" />
@@ -80,7 +112,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="model" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="deepseekAPI" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="djsSensitivityAnalysis" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -93,7 +125,29 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/deepseekAPI.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="downloadData" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="djsSensitivityAnalysis" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/downloadData.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -124,57 +178,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="train_model_with_word2vc" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="djsSensitivityAnalysis" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train_model_with_word2vc.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="train_word2vc" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="djsSensitivityAnalysis" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train_word2vc.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.app" />
-        <item itemvalue="Python.train_model_with_word2vc" />
         <item itemvalue="Python.train (1)" />
-        <item itemvalue="Python.train_word2vc" />
-        <item itemvalue="Python.model" />
+        <item itemvalue="Python.downloadData" />
+        <item itemvalue="Python.TencentTest" />
+        <item itemvalue="Python.deepseekAPI" />
       </list>
     </recent_temporary>
   </component>
@@ -258,7 +268,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739690388639</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="update the front of web">
+      <option name="closed" value="true" />
+      <created>1739869428964</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1739869428964</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -267,6 +285,7 @@
     <MESSAGE value="update readme" />
     <MESSAGE value="add lstm_norm and use word2vc tokenized by punkt." />
     <MESSAGE value="add word2vc model train and use" />
-    <option name="LAST_COMMIT_MESSAGE" value="add word2vc model train and use" />
+    <MESSAGE value="update the front of web" />
+    <option name="LAST_COMMIT_MESSAGE" value="update the front of web" />
   </component>
 </project>

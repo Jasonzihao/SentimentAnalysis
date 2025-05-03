@@ -49,7 +49,7 @@ def analysis(query):
     with open('onehot_dict_punk.json', 'r') as f:
         vocab = json.load(f)
     # 加载模型
-    model_path = 'model_pt/djs_best.pt'  # 请将此路径修改为你实际保存的模型文件路径
+    model_path = 'model_pt/djs_model_epoch_0.869598271446863_em500_hi500_ba32.pt'  # 请将此路径修改为你实际保存的模型文件路径
     no_layers = 1
     vocab_size = len(vocab) + 1
     embedding_dim = 500

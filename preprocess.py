@@ -87,7 +87,7 @@ def tokenize_with_punkt(x_train, y_train, x_val, y_val):
     word_list = []
     stop_words = set(stopwords.words('english'))
     if os.path.exists('onehot_dict_punk.json'):
-        with open('onehot_dict.json', 'r') as f:
+        with open('onehot_dict_punk.json', 'r') as f:
             onehot_dict = json.load(f)
     else:
         # 使用 Punkt 分词器处理训练数据
@@ -100,7 +100,7 @@ def tokenize_with_punkt(x_train, y_train, x_val, y_val):
 
         # 构建词汇表
         corpus = Counter(word_list)
-        corpus_ = sorted(corpus, key=corpus.get, reverse=True)[:15000]
+        corpus_ = sorted(corpus, key=corpus.get, reverse=True)[:20000]
         onehot_dict = {w: i + 1 for i, w in enumerate(corpus_)}
         # 保存词汇表到本地
         with open('onehot_dict_punk.json', 'w') as f:
@@ -120,10 +120,10 @@ def tokenize_with_punkt(x_train, y_train, x_val, y_val):
     # 对分词后的结果进行填充
     final_list_train = padding_(final_list_train, 500)
     final_list_test = padding_(final_list_test, 500)
-    print(final_list_train[0])
-    print(final_list_test[0])
-    print(len(final_list_train))
-    print(len(final_list_test))
+    # print(final_list_train[0])
+    # print(final_list_test[0])
+    # print(len(final_list_train))
+    # print(len(final_list_test))
 
 
 
