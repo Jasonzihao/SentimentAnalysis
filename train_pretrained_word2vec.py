@@ -21,8 +21,9 @@ from tqdm import tqdm
 from torch.utils.data import TensorDataset, DataLoader
 import gensim
 import gensim.downloader as api
+from gensim.models import KeyedVectors
 
-from model import MAIN_Model, MAIN_PLUS_WORD2VC_Model, MAIN_Model_maxPooling
+from model import MAIN_Model, MAIN_PLUS_WORD2VC_Model, MAIN_Model_pretrained_embedding
 from preprocess import tokenize, padding_, tokenize_with_punkt
 from train_word2vc import load_word2vc
 
@@ -38,18 +39,41 @@ else:
 #load dataset
 from datasets import load_dataset, load_from_disk
 
+# 下载并加载预训练Word2Vec模型（这里使用Google News 300d，首次运行会下载约3.4GB文件）
+# 也可以使用更小的模型如'glove-wiki-gigaword-300'或'word2vec-ruscorpora-300'
+# 如果网络问题，可以手动下载后指定路径
+pretrained_model_name = 'word2vec-google-news-300'
+wv = api.load(pretrained_model_name)
+# 构建预训练嵌入矩阵
+embedding_dim = 300  # 匹配预训练模型维度
+vocab_size = 30000
+pretrained_embedding = np.zeros((vocab_size, embedding_dim), dtype=np.float32)
+# 填充已知词：
+# - padding_idx=0 保持全0
+# - 1到len(wv.vocab)为正常词汇
+# - len(wv.vocab)+1为OOV词（索引从0开始，需注意索引对应）
+print("get word2vec model...")
+# 遍历key_to_index获取单词和索引（替代原vocab）
+for word, idx_in_wv in wv.key_to_index.items():
+    # 原逻辑：索引0为padding，实际单词从索引1开始填充
+    # idx_in_wv：预训练模型中的原始索引（从0开始）
+    # 目标位置：1 <= target_idx < vocab_size-1（留出最后一位给OOV）
+    target_idx = idx_in_wv + 1  # 跳过padding的0索引
+    if target_idx < vocab_size - 1:  # 避免超出自定义词表大小
+        pretrained_embedding[target_idx] = wv[word]
+# OOV词处理：索引vocab_size-1（最后一位）
+pretrained_embedding[-1] = np.random.normal(scale=0.01, size=embedding_dim)
+print("get word2vec model successfully")
+
 dataset = load_dataset("imdb")
 # dataset = load_from_disk("imdb")
-
 #create test and train split
 x_train = dataset['train']['text']
 y_train = dataset['train']['label']
 x_test = dataset['test']['text']
 y_test = dataset['test']['label']
-# x_train = x_train + x_test[:7500] + x_test[17500:]
-# y_train = y_train + y_test[:7500] + y_test[17500:]
-# x_test = x_test[7500:17500]
-# y_test = y_test[7500:17500]
+# x_train = dataset['train']['text'] + x_test[:15000]
+# y_train = dataset['train']['label'] + y_test[:15000]
 print(f"len of x_train:{len(x_train)}")
 print(f"len of y_train:{len(y_train)}")
 print(f"len of x_test:{len(x_test)}")
@@ -59,7 +83,7 @@ import nltk
 nltk.download('stopwords')
 nltk.download('punkt_tab')
 # x_train,y_train,x_test,y_test,vocab = tokenize(x_train,y_train,x_test,y_test)
-x_train_pad,y_train,x_test_pad,y_test,vocab = tokenize_with_punkt(x_train,y_train,x_test,y_test)
+x_train_pad,y_train,x_test_pad,y_test,_ = tokenize_with_punkt(x_train,y_train,x_test,y_test)
 print("success tokenize!")
 
 # x_train_pad = padding_(x_train,500)
@@ -81,13 +105,12 @@ valid_loader = DataLoader(valid_data, shuffle=True, batch_size=batch_size, drop_
 # sample_x, sample_y = next(dataiter)
 
 no_layers = 1
-vocab_size = len(vocab) + 1 #extra 1 for padding
 print(f"vocab_size:{vocab_size}")
 
-embedding_dim = 500
+embedding_dim = 300
 output_dim = 1
 hidden_dim = 500
-model = MAIN_Model_maxPooling(no_layers,vocab_size,embedding_dim,hidden_dim)
+model = MAIN_Model_pretrained_embedding(no_layers,embedding_dim,hidden_dim,pretrained_embedding)
 
 model.to(device)
 print(model)
